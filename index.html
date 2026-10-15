@@ -1,0 +1,105 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notificaciones de broma</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px 15px;
+      background: #171717;
+      color: white;
+    }
+    button {
+      padding: 14px 20px;
+      margin: 8px;
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    #activar { background: #2878ff; color: white; }
+    #parar { background: #555; color: white; }
+  </style>
+</head>
+<body>
+  <h1>🔔 Notificaciones de broma</h1>
+  <p>Activa las notificaciones de prueba.</p>
+  <button id="activar">Activar notificaciones</button>
+  <button id="parar">Parar</button>
+  <p id="estado">Desactivadas</p>
+
+  <script>
+    let temporizador = null;
+    let enviadas = 0;
+
+    const mensajes = [
+      "🚨 Alerta ficticia: Mario está a 5 km de una pizza 🍕",
+      "😂 Noticia de broma: ¡el comité de memes te busca!",
+      "🐧 Un pingüino ha solicitado la contraseña del Wi-Fi.",
+      "🤖 Notificación de prueba: ¡has desbloqueado un meme!",
+      "📢 Fin de la prueba de notificaciones."
+    ];
+
+    document.getElementById("activar").onclick = async () => {
+      if (!("Notification" in window)) {
+        document.getElementById("estado").textContent =
+          "Tu navegador no admite notificaciones.";
+        return;
+      }
+
+      if (!window.isSecureContext) {
+        document.getElementById("estado").textContent =
+          "Necesitas abrir la web con HTTPS, por ejemplo, GitHub Pages.";
+        return;
+      }
+
+      let permiso = Notification.permission;
+
+      if (permiso === "default") {
+        permiso = await Notification.requestPermission();
+      }
+
+      if (permiso !== "granted") {
+        document.getElementById("estado").textContent =
+          "Permite las notificaciones en el navegador.";
+        return;
+      }
+
+      clearInterval(temporizador);
+      enviadas = 0;
+
+      function enviar() {
+        if (enviadas >= mensajes.length) {
+          clearInterval(temporizador);
+          temporizador = null;
+          document.getElementById("estado").textContent =
+            "Prueba terminada.";
+          return;
+        }
+
+        new Notification("Notificación de broma", {
+          body: mensajes[enviadas]
+        });
+
+        enviadas++;
+        document.getElementById("estado").textContent =
+          "Enviadas: " + enviadas + " de " + mensajes.length;
+      }
+
+      enviar();
+      temporizador = setInterval(enviar, 30000);
+    };
+
+    document.getElementById("parar").onclick = () => {
+      clearInterval(temporizador);
+      temporizador = null;
+      document.getElementById("estado").textContent = "Notificaciones paradas.";
+    };
+  </script>
+</body>
+</html>
+```
